@@ -35,7 +35,15 @@ func init() {
 
 	// Open connection to database
 	var err error
+	if err = DB.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
 	DB, err = sql.Open("postgres", pgURL)
+	if err != nil {
+		logFatal(err)
+	}
+
 	if err = DB.Ping(); err != nil {
 		logFatal(err)
 	}
