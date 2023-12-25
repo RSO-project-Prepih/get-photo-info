@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
-	"github.com/joho/godotenv"
+	"github.com/RSO-project-Prepih/get-photo-info/prometheus"
 	_ "github.com/lib/pq"
 )
 
@@ -18,11 +19,7 @@ func logFatal(err error) {
 
 var DB *sql.DB
 
-func init() {
-	// Load .env file for environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+func NewDBConnection() *sql.DB {
 
 	pgURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=verify-full",
@@ -33,21 +30,34 @@ func init() {
 		os.Getenv("DB_NAME"),
 	)
 
-	// Open connection to database
+	var db *sql.DB
 	var err error
-	if err = DB.Ping(); err != nil {
-		log.Fatal(err)
+
+	maxRetries := 5
+
+	delay := 500 * time.Millisecond
+
+	for i := 0; i < maxRetries; i++ {
+		prometheus.DBConnectionAttempts.Inc()
+		db, err = sql.Open("postgres", pgURL)
+		if err == nil {
+			prometheus.DBConnectionAttempts.Inc()
+			err = db.Ping()
+			if err == nil {
+				log.Println("Connected to database")
+				return db
+			}
+		}
+
+		log.Printf("Failed to connect to database: %v. Retrying in %v...\n", err, delay)
+		time.Sleep(delay)
+
+		// Increase the delay for the next retry using exponential backoff
+		delay *= 2
 	}
 
-	DB, err = sql.Open("postgres", pgURL)
-	if err != nil {
-		logFatal(err)
-	}
-
-	if err = DB.Ping(); err != nil {
-		logFatal(err)
-	}
-
+	logFatal(err)
+	return nil
 }
 
 func TestConnection() {

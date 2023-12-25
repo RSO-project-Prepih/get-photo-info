@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package photo;
+
+option go_package = "github.com/RSO-project-Prepih/get-photo-info";
+
+service PhotoService {
+  rpc GetPhotoInfo(PhotoRequest) returns (PhotoResponse) {}
+}
+
+message PhotoRequest {
+  bytes photo = 1;
+  string image_id = 2;
+}
+
+message PhotoResponse {
+  bool allowed = 1;
+  string exifData = 2;
+}
