@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/RSO-project-Prepih/get-photo-info/database"
 	"github.com/RSO-project-Prepih/get-photo-info/handlers"
@@ -17,7 +19,7 @@ type photoServer struct {
 }
 
 func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*pb.PhotoResponse, error) {
-	log.Printf("Received photo: %v", req.GetPhoto())
+	log.Printf("Received photo image id", req.GetImageId())
 
 	metadata, err := handlers.GetPhotoInfo(req.GetPhoto())
 	if err != nil {
@@ -29,11 +31,6 @@ func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*
 
 	// Optionally save EXIF data to the database
 	if allowed {
-		err := saveMetadataToDatabase(metadata, req.GetImageId())
-		if err != nil {
-			log.Println("Error saving metadata to the database:", err)
-			return nil, err
-		}
 
 		// Format metadata
 		exifData, err := formatMetadata(metadata)
@@ -46,6 +43,14 @@ func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*
 			Allowed:  allowed,
 			ExifData: exifData,
 		}, nil
+
+		time.Sleep(8 * time.Second)
+
+		err = saveMetadataToDatabase(metadata, req.GetImageId())
+		if err != nil {
+			log.Println("Error saving metadata to the database:", err)
+			return nil, err
+		}
 	}
 
 	return &pb.PhotoResponse{
@@ -69,40 +74,41 @@ func formatMetadata(metadata map[string]string) (string, error) {
 func checkCoordinates(metadata map[string]string) bool {
 	log.Println("Checking coordinates...")
 
-	// allowed coordinates
-	firstCoordinate := []float64{45.714683, 14.058524}
-	secondCoordinate := []float64{45.880323, 14.053031}
-	thirdCoordinate := []float64{45.887015, 14.302970}
-	fourthCoordinate := []float64{45.714683, 14.294730}
+	// Define the bounding box
+	minLatitude := 45.714683
+	maxLatitude := 45.887015
+	minLongitude := 14.053031
+	maxLongitude := 14.302970
 
-	box := [][]float64{firstCoordinate, secondCoordinate, thirdCoordinate, fourthCoordinate}
-
-	// Parse latitude and longitude
+	// Parse latitude and longitude from metadata
 	latitude, err := strconv.ParseFloat(metadata["Latitude"], 64)
+	log.Println("Latitude:", latitude)
 	if err != nil {
 		log.Println("Error parsing latitude:", err)
 		return false
 	}
 	longitude, err := strconv.ParseFloat(metadata["Longitude"], 64)
+	log.Println("Longitude:", longitude)
 	if err != nil {
 		log.Println("Error parsing longitude:", err)
 		return false
 	}
 
-	// Check if the coordinates are in the box allowed range
-	if latitude < box[0][0] && latitude > box[3][0] && longitude > box[0][1] && longitude < box[1][1] {
+	// Check if the coordinates are within the bounding box
+	if latitude >= minLatitude && latitude <= maxLatitude && longitude >= minLongitude && longitude <= maxLongitude {
 		log.Println("Coordinates are in the allowed range")
 		return true
 	}
 
+	log.Println("Coordinates are not in the allowed range")
 	return false
 }
 
 func saveMetadataToDatabase(metadata map[string]string, imageID string) error {
+	log.Println("Saving metadata to the database...")
 	db := database.NewDBConnection()
 	defer db.Close()
 
-	// Prepare your query with the correct table and column names
 	query := `
         INSERT INTO photo_metadata (
             image_id, camera_model, date, latitude, longitude, 
@@ -118,14 +124,27 @@ func saveMetadataToDatabase(metadata map[string]string, imageID string) error {
 	}
 	defer stmt.Close()
 
+	// Function to safely convert string to float64 for SQL
+	safeConvert := func(s string) interface{} {
+		if s == "" {
+			return nil
+		}
+		val, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			log.Printf("Error converting string to float64: %v", err)
+			return nil
+		}
+		return val
+	}
+
 	// Execute the statement
 	_, err = stmt.Exec(
 		imageID,
 		metadata["Camera Model"],
-		metadata["Date"],
-		metadata["Latitude"],
-		metadata["Longitude"],
-		metadata["Altitude"],
+		strings.Trim(metadata["Date"], "\""),
+		safeConvert(metadata["Latitude"]),
+		safeConvert(metadata["Longitude"]),
+		safeConvert(metadata["Altitude"]),
 		metadata["Exposure Time"],
 		metadata["Lens Model"],
 	)
