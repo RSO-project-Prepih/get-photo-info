@@ -14,18 +14,10 @@ import (
 	"github.com/RSO-project-Prepih/get-photo-info/prometheus"
 	"github.com/RSO-project-Prepih/get-photo-info/server"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 
 	pb "github.com/RSO-project-Prepih/get-photo-info/github.com/RSO-project-Prepih/get-photo-info"
 )
-
-// Load .env file for environment variables
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-}
 
 func main() {
 	log.Println("Starting the application...")
