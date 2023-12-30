@@ -54,6 +54,7 @@ func main() {
 
 	log.Println("Starting the HTTP server...")
 	r := gin.Default()
+
 	// get health
 	liveHandler, readyHandler := health.HealthCheckHandler()
 	r.GET("/live", gin.WrapH(liveHandler))
@@ -86,5 +87,4 @@ func main() {
 	}
 
 	log.Println("Server exiting")
-
 }

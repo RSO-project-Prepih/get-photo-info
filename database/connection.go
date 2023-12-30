@@ -59,20 +59,3 @@ func NewDBConnection() *sql.DB {
 	logFatal(err)
 	return nil
 }
-
-func TestConnection() {
-	rows, err := DB.Query("SELECT name FROM users")
-	logFatal(err)
-	defer rows.Close()
-
-	fmt.Println("Usernames from the 'users' table:")
-	for rows.Next() {
-		var username string
-		err := rows.Scan(&username)
-		logFatal(err)
-		fmt.Println(username)
-	}
-
-	err = rows.Err()
-	logFatal(err)
-}

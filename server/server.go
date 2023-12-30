@@ -18,7 +18,7 @@ type photoServer struct {
 }
 
 func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*pb.PhotoResponse, error) {
-	log.Printf("Received photo image id", req.GetImageId())
+	log.Printf("Received photo image id: %s", req.GetImageId())
 
 	metadata, err := handlers.GetPhotoInfo(req.GetPhoto())
 	if err != nil {
