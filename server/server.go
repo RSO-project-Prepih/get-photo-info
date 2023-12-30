@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/RSO-project-Prepih/get-photo-info/database"
 	"github.com/RSO-project-Prepih/get-photo-info/handlers"
@@ -29,8 +28,13 @@ func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*
 	// Check coordinates and decide if allowed
 	allowed := checkCoordinates(metadata)
 
-	// Optionally save EXIF data to the database
 	if allowed {
+
+		err = saveMetadataToDatabase(metadata, req.GetImageId())
+		if err != nil {
+			log.Println("Error saving metadata to the database:", err)
+			return nil, err
+		}
 
 		// Format metadata
 		exifData, err := formatMetadata(metadata)
@@ -44,13 +48,6 @@ func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*
 			ExifData: exifData,
 		}, nil
 
-		time.Sleep(8 * time.Second)
-
-		err = saveMetadataToDatabase(metadata, req.GetImageId())
-		if err != nil {
-			log.Println("Error saving metadata to the database:", err)
-			return nil, err
-		}
 	}
 
 	return &pb.PhotoResponse{
