@@ -56,7 +56,7 @@ func main() {
 	r.GET("/metrics", gin.WrapH(prometheus.GetMetrics()))
 
 	srver := &http.Server{
-		Addr:    ":5000",
+		Addr:    ":8080",
 		Handler: r,
 	}
 
