@@ -40,7 +40,7 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-            echo "$DOCKERHUB_ACCESS_TOKEN" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+            echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push jabok123458/rso-infor:latest
 
 # Invoke jobs via workflows
