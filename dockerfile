@@ -23,7 +23,7 @@ RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/server /server
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 8080 50051
 
 # Run the server
 CMD ["/server"]
