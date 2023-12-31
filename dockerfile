@@ -22,7 +22,10 @@ RUN apk --no-cache add ca-certificates
 # Copy the built binary from the builder stage
 COPY --from=builder /app/server /server
 
-# Expose the port the app runs on
+# Set execute permissions
+RUN chmod +x /server
+
+# Expose the ports the app runs on
 EXPOSE 8080 50051
 
 # Run the server
