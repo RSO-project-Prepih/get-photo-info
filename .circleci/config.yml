@@ -36,12 +36,23 @@ jobs:
           path: /tmp/test-reports
       - run:
           name: Build Docker Image
-          command: docker build -t jabok123458/rso-infor:latest .
+          command: docker build -t jabok123458/rso-infor:${CIRCLE_SHA1} .
       - run:
           name: Push Docker Image
           command: |
             echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push jabok123458/rso-infor:latest
+            docker push jabok123458/rso-infor:${CIRCLE_SHA1}
+      - run:
+          name: Update Helm Chart
+          command: |
+            git clone https://github.com/yourusername/your-helm-chart-repo.git
+            cd your-helm-chart-repo
+            sed -i 's|repository: jabok123458/rso-infor:.*|repository: jabok123458/rso-infor:'${CIRCLE_SHA1}'|' ./values.yaml
+            git config user.name "CircleCI"
+            git config user.email "circleci@example.com"
+            git commit -am "Update image tag to ${CIRCLE_SHA1}"
+            git push
+
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows

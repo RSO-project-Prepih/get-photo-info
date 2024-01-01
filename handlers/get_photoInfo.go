@@ -10,7 +10,6 @@ import (
 
 func GetPhotoInfo(photoBytes []byte) (map[string]string, error) {
 	// Extract EXIF metadata, check coordinates, and store in the database
-	// Return PhotoResponse
 
 	reader := bytes.NewReader(photoBytes)
 	exifData, err := exif.Decode(reader)
