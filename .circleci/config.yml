@@ -7,12 +7,8 @@ version: 2.1
 jobs:
   build:
     working_directory: ~/repo
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       - image: cimg/go:1.21.3
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
       - checkout
       - setup_remote_docker:
@@ -43,31 +39,20 @@ jobs:
             echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push jabok123458/rso-infor:${CIRCLE_SHA1}
       - run:
-          name: Setup Git with GitHub Token
-          command: |
-            git config --global user.email "jakob.dekleva@gmail.com"
-            git config --global user.name "lovc21"
-            echo "machine github.com login ${GITHUB_TOKEN}" > ~/.netrc
-      - run:
           name: Update Helm Chart
           command: |
-            git clone https://github.com/RSO-project-Prepih/kubernetis-GKE.git
-            cd kubernetis-GKE
-            cd img-info-service
+            git clone git@github.com:RSO-project-Prepih/kubernetis-GKE.git
+            cd kubernetis-GKE/img-info-service
             echo "Before sed command:"
             cat ./values.yaml
             sed -i 's|tag: .*|tag: '${CIRCLE_SHA1}'|' ./values.yaml
             echo "After sed command:"
             cat ./values.yaml
-            git config user.name "lovc21"
-            git config user.email "jakob.dekleva@gmail.com"
+            git add ./values.yaml
             git commit -am "Update image tag to ${CIRCLE_SHA1}" || echo "No changes to commit"
             git push origin main
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  sample:
     jobs:
       - build
