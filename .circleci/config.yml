@@ -45,11 +45,12 @@ jobs:
       - run:
           name: Update Helm Chart
           command: |
-            git clone https://github.com/yourusername/your-helm-chart-repo.git
-            cd your-helm-chart-repo
+            git clone https://github.com/RSO-project-Prepih/kubernetis-GKE.git
+            cd kubernetis-GKE
+            cd img-info-service
             sed -i 's|repository: jabok123458/rso-infor:.*|repository: jabok123458/rso-infor:'${CIRCLE_SHA1}'|' ./values.yaml
-            git config user.name "CircleCI"
-            git config user.email "circleci@example.com"
+            git config user.name "lovc21"
+            git config user.email "jakob.dekleva@gmail.com"
             git commit -am "Update image tag to ${CIRCLE_SHA1}"
             git push
 
