@@ -48,10 +48,14 @@ jobs:
             git clone https://github.com/RSO-project-Prepih/kubernetis-GKE.git
             cd kubernetis-GKE
             cd img-info-service
+            echo "Before sed command:"
+            cat ./values.yaml
             sed -i 's|repository: jabok123458/rso-infor:.*|repository: jabok123458/rso-infor:'${CIRCLE_SHA1}'|' ./values.yaml
+            echo "After sed command:"
+            cat ./values.yaml
             git config user.name "lovc21"
             git config user.email "jakob.dekleva@gmail.com"
-            git commit -am "Update image tag to ${CIRCLE_SHA1}"
+            git commit -am "Update image tag to ${CIRCLE_SHA1}" || echo "No changes to commit"
             git push
 
 
