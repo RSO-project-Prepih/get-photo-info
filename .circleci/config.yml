@@ -48,10 +48,12 @@ jobs:
             sed -i 's|tag: .*|tag: '${CIRCLE_SHA1}'|' ./values.yaml
             echo "After sed command:"
             cat ./values.yaml
+            git config user.name "lovc21"
+            git config user.email "jakob.dekleva@gmail.com"
             git add ./values.yaml
             git commit -am "Update image tag to ${CIRCLE_SHA1}" || echo "No changes to commit"
             git push origin main
-
+            
 workflows:
   sample:
     jobs:
