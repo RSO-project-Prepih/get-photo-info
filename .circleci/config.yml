@@ -54,7 +54,7 @@ jobs:
             git commit -am "Update image tag to ${CIRCLE_SHA1}" || echo "No changes to commit"
             git push origin main
             
-            
+# Define a workflow to orchestrate jobs.
 workflows:
   sample:
     jobs:
