@@ -50,7 +50,7 @@ jobs:
             cd img-info-service
             echo "Before sed command:"
             cat ./values.yaml
-            sed -i 's|repository: jabok123458/rso-infor:.*|repository: jabok123458/rso-infor:'${CIRCLE_SHA1}'|' ./values.yaml
+            sed -i 's|repository: .*/rso-infor:.*|repository: jabok123458/rso-infor:'${CIRCLE_SHA1}'|' ./values.yaml
             echo "After sed command:"
             cat ./values.yaml
             git config user.name "lovc21"
