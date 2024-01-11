@@ -5,3 +5,9 @@ This is a simple microservice that returns information about a photo and uploads
 
 ## CircleCI status CI/CD
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/RSO-project-Prepih/get-photo-info/tree/main.svg?style=svg)]
+
+## Swagger openapi documentation
+To see the swagger documentation you need to run the application and go to the following endpoint:
+```
+http://localhost:8080/openapi/index.html
+```
