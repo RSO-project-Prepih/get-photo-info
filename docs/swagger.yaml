@@ -1,0 +1,85 @@
+basePath: /v1
+definitions:
+  get_photo_info.PhotoRequest:
+    properties:
+      image_id:
+        type: string
+      photo:
+        items:
+          type: integer
+        type: array
+    type: object
+info:
+  contact: {}
+  description: This is a service for getting photo metadata
+  title: Get Photo Info API
+  version: "1.0"
+paths:
+  /live:
+    get:
+      consumes:
+      - application/json
+      description: get the health checks of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get get health checks
+      tags:
+      - health
+  /metrics:
+    get:
+      consumes:
+      - application/json
+      description: get the metrics of the service (prometheus)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get get metrics
+      tags:
+      - metrics
+  /photo/info:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves information about a photo
+      parameters:
+      - description: Photo Request
+        in: body
+        name: photo
+        required: true
+        schema:
+          $ref: '#/definitions/get_photo_info.PhotoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get photo information
+      tags:
+      - photo
+  /ready:
+    get:
+      consumes:
+      - application/json
+      description: get the health checks of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get get health checks
+      tags:
+      - health
+swagger: "2.0"

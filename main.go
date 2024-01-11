@@ -10,15 +10,22 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/RSO-project-Prepih/get-photo-info/docs"
 	"github.com/RSO-project-Prepih/get-photo-info/health"
 	"github.com/RSO-project-Prepih/get-photo-info/prometheus"
 	"github.com/RSO-project-Prepih/get-photo-info/server"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"google.golang.org/grpc"
 
 	pb "github.com/RSO-project-Prepih/get-photo-info/github.com/RSO-project-Prepih/get-photo-info"
 )
 
+// @title Get Photo Info API
+// @description This is a service for getting photo metadata
+// @version 1.0
+// @BasePath /v1
 func main() {
 	log.Println("Starting the application...")
 
@@ -54,6 +61,9 @@ func main() {
 
 	// get metrics
 	r.GET("/metrics", gin.WrapH(prometheus.GetMetrics()))
+
+	// Define the routes for the swagger
+	r.GET("/openapi/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	srver := &http.Server{
 		Addr:    ":8080",

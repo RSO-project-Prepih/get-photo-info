@@ -11,6 +11,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// GetHealth checks godoc
+// @Summary Get get health checks
+// @Description get the health checks of the service
+// @Tags health
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} string
+// @Router /live [get]
+// @Router /ready [get]
 func HealthCheckHandler() (http.HandlerFunc, http.HandlerFunc) {
 	log.Println("Starting the health check...")
 	// Create a health instance.

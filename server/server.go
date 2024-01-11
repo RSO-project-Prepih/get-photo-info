@@ -17,6 +17,15 @@ type photoServer struct {
 	pb.UnimplementedPhotoServiceServer
 }
 
+// GetPhotoInfo godoc
+// @Summary Get photo information
+// @Description Retrieves information about a photo
+// @Tags photo
+// @Accept  json
+// @Produce  json
+// @Param photo body pb.PhotoRequest true "Photo Request"
+// @Success 200 {object} string
+// @Router /photo/info [post]
 func (s *photoServer) GetPhotoInfo(ctx context.Context, req *pb.PhotoRequest) (*pb.PhotoResponse, error) {
 	log.Printf("Received request for GetPhotoInfo with image id: %s", req.GetImageId())
 	log.Printf("Received photo image id: %s", req.GetImageId())
